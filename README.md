@@ -16,6 +16,7 @@ commit holding the `occt.wasm` that release ships.
 | `build.sh` | the exact build command, with the libcascade image pinned by digest |
 | `occt.provenance.json` | the image's record of the source versions and flags that went in |
 | `occt.build-manifest.json` | the linker's report: source files, bound symbols, validation |
+| `occt.config` | the hash of the configuration this build came from; Takumion's release reuses the build while it matches |
 | `NOTICE.md` | the licence notice: OCCT and libcascade, LGPL-2.1 with the Open CASCADE exception |
 
 ## How it is built
