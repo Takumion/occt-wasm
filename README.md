@@ -3,7 +3,9 @@
 [Open CASCADE Technology](https://github.com/Open-Cascade-SAS/OCCT) 8.0.1,
 compiled to WebAssembly, exactly as the Takumion editor loads it. Every commit
 here is published by Takumion's release workflow from the build it ships; the
-commit message names the configuration hash it was linked from.
+commit message names the configuration hash it was linked from. Each Takumion
+release is a tag, `takumion-v<version>` (e.g. `takumion-v0.1.0`), on the
+commit holding the `occt.wasm` that release ships.
 
 | File | What it is |
 |---|---|
