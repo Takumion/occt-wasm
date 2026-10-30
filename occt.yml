@@ -1,0 +1,364 @@
+mainBuild:
+  name: occt.js
+  bindings:
+    # ── Geometry primitives (3D) ─────────────────────────────────────────
+    - symbol: gp_Pnt
+    - symbol: gp_Vec
+    - symbol: gp_Dir
+    - symbol: gp_Ax1
+    - symbol: gp_Ax2
+    - symbol: gp_Ax3
+    - symbol: gp_Trsf
+    # GTrsf is the NON-orthogonal transform: gp_Trsf can only carry a rigid
+    # motion plus a UNIFORM scale, so a per-axis scale needs this one plus
+    # BRepBuilderAPI_GTransform (already bound below).
+    - symbol: gp_GTrsf
+    - symbol: gp_Mat
+    - symbol: gp_Lin
+    - symbol: gp_Pln
+    - symbol: gp_Circ
+    - symbol: gp_Elips
+    - symbol: gp_Cylinder
+    - symbol: gp_Cone
+    - symbol: gp_Sphere
+    - symbol: gp_Torus
+
+    # ── Geometry primitives (2D) ─────────────────────────────────────────
+    - symbol: gp_Pnt2d
+    - symbol: gp_Vec2d
+    - symbol: gp_Dir2d
+    - symbol: gp_Ax2d
+    - symbol: gp_Ax22d
+    - symbol: gp_Trsf2d
+    - symbol: gp_Lin2d
+    - symbol: gp_Circ2d
+    - symbol: gp_Elips2d
+
+    # ── Location ─────────────────────────────────────────────────────────
+    - symbol: TopLoc_Location
+
+    # ── Topology data types ──────────────────────────────────────────────
+    - symbol: TopoDS
+    - symbol: TopoDS_Shape
+    - symbol: TopoDS_Builder
+    - symbol: TopoDS_Compound
+    - symbol: TopoDS_CompSolid
+    - symbol: TopoDS_Solid
+    - symbol: TopoDS_Shell
+    - symbol: TopoDS_Face
+    - symbol: TopoDS_Wire
+    - symbol: TopoDS_Edge
+    - symbol: TopoDS_Vertex
+    - symbol: TopoDS_Iterator
+    - symbol: TopTools_ListOfShape
+    - symbol: TopTools_IndexedMapOfShape
+    - symbol: TopTools_IndexedDataMapOfShapeListOfShape
+    - symbol: NCollection_BaseList
+
+    # ── Topology exploration ─────────────────────────────────────────────
+    - symbol: TopExp
+    - symbol: TopExp_Explorer
+
+    # ── Topology enums ───────────────────────────────────────────────────
+    - symbol: TopAbs_ShapeEnum
+    - symbol: TopAbs_Orientation
+    - symbol: TopAbs_State
+
+    # ── BRep builder + analysis ──────────────────────────────────────────
+    - symbol: BRep_Builder
+    - symbol: BRep_Tool
+    - symbol: BRepLib
+    - symbol: BRepCheck_Analyzer
+
+    # ── Base classes (required by opencascade.js for inheritance chains) ─
+    - symbol: Standard_Transient
+    - symbol: BRepBuilderAPI_Command
+    - symbol: BRepBuilderAPI_MakeShape
+    - symbol: BRepBuilderAPI_ModifyShape
+    - symbol: BRepPrimAPI_MakeSweep
+    - symbol: BRepPrimAPI_MakeOneAxis
+    - symbol: BRepAlgoAPI_Algo
+    - symbol: BRepAlgoAPI_BuilderAlgo
+    - symbol: BRepAlgoAPI_BooleanOperation
+    - symbol: BRepFilletAPI_LocalOperation
+    - symbol: BRepMesh_DiscretRoot
+    - symbol: Adaptor3d_Curve
+    - symbol: Adaptor3d_Surface
+    - symbol: Geom_Geometry
+    - symbol: GC_Root
+
+    # ── Shape builders ───────────────────────────────────────────────────
+    - symbol: BRepBuilderAPI_MakeWire
+    - symbol: BRepBuilderAPI_MakeEdge
+    - symbol: BRepBuilderAPI_MakeFace
+    - symbol: BRepBuilderAPI_MakeShell
+    - symbol: BRepBuilderAPI_MakeSolid
+    - symbol: BRepBuilderAPI_MakeVertex
+    - symbol: BRepBuilderAPI_MakePolygon
+    - symbol: BRepBuilderAPI_Transform
+    - symbol: BRepBuilderAPI_GTransform
+    - symbol: BRepBuilderAPI_Copy
+    - symbol: BRepBuilderAPI_NurbsConvert
+    - symbol: BRepBuilderAPI_Sewing
+
+    # ── Shape healing / upgrade (Phase 8b face merge) ────────────────────
+    # Merges faces/edges lying on the same underlying surface into one face so a
+    # curved wall OCCT split into N faces collapses to a single continuous
+    # triangulation (no shading seam). Unlike IMeshTools_Parameters above, this is
+    # a normal class (Build/Shape/History methods) so opencascade.js binds it fully.
+    - symbol: ShapeUpgrade_UnifySameDomain
+
+    # ── Solid primitives ────────────────────────────────────────────────
+    - symbol: BRepPrimAPI_MakeBox
+    - symbol: BRepPrimAPI_MakeSphere
+    - symbol: BRepPrimAPI_MakeCylinder
+    - symbol: BRepPrimAPI_MakeCone
+    - symbol: BRepPrimAPI_MakeTorus
+    - symbol: BRepPrimAPI_MakeWedge
+    - symbol: BRepPrimAPI_MakeHalfSpace
+
+    # ── Curve / arc construction (3D) ───────────────────────────────────
+    - symbol: GC_MakeArcOfCircle
+    - symbol: GC_MakeArcOfEllipse
+    - symbol: GC_MakeCircle
+    - symbol: GC_MakeEllipse
+    - symbol: GC_MakeLine
+    - symbol: GC_MakeSegment
+    - symbol: GC_MakePlane
+
+    # ── Operations: extrude & revolve ────────────────────────────────────
+    - symbol: BRepPrimAPI_MakePrism
+    - symbol: BRepPrimAPI_MakeRevol
+    - symbol: BRepPrimAPI_MakeRevolution
+
+    # ── Operations: sweep & loft ─────────────────────────────────────────
+    - symbol: BRepOffsetAPI_MakePipe
+    - symbol: BRepOffsetAPI_MakePipeShell
+    # MakePipeShell::SetTransitionMode(RightCorner) is the ONLY way to sweep a
+    # spine with a corner correctly. Without this enum bound, every sweeper in
+    # the build carries the profile straight past the corner: an L-shaped path
+    # reports IsDone, the bbox follows the whole spine, and the volume comes
+    # out as pi*r^2*(L1 + L2*cos(theta)) — the second leg swept along its own
+    # projection. Measured, not theorised (SDK sweepLoft.test.ts).
+    - symbol: BRepBuilderAPI_TransitionMode
+    # The trihedron mode for MakePipe_2 — the same family of choice, bound so
+    # a frame other than the default is reachable at all.
+    - symbol: GeomFill_Trihedron
+    # A sweep's taper (actions-plan M3-3): each section is the profile's region
+    # OFFSET in its own plane by s·tan θ (Fusion p50c), not scaled — a 2D wire
+    # offset with intersection joins. TypeOfContact is MakePipeShell's
+    # auxiliary-spine (guide rail) mode argument; without it that SetMode
+    # overload throws "unknown type".
+    - symbol: BRepOffsetAPI_MakeOffset
+    - symbol: BRepFill_TypeOfContact
+    - symbol: BRepOffsetAPI_ThruSections
+
+    # ── Operations: boolean ──────────────────────────────────────────────
+    - symbol: BRepAlgoAPI_Fuse
+    - symbol: BRepAlgoAPI_Cut
+    - symbol: BRepAlgoAPI_Common
+    - symbol: BRepAlgoAPI_Section
+    - symbol: Message_ProgressRange
+
+    # ── Operations: fillet & chamfer ─────────────────────────────────────
+    - symbol: BRepFilletAPI_MakeFillet
+    - symbol: BRepFilletAPI_MakeChamfer
+    - symbol: ChFi3d_FilletShape
+
+    # ── Operations: shell & offset ───────────────────────────────────────
+    - symbol: BRepOffsetAPI_MakeThickSolid
+    - symbol: BRepOffsetAPI_MakeOffsetShape
+    - symbol: BRepOffset_Mode
+    - symbol: GeomAbs_JoinType
+    # BRepOffset_MakeOffset itself cannot be listed: the image's warm cache has
+    # no compiled binding for it (the link refuses it as unresolved). Offset
+    # Face reaches it through `CadFaceOffset` in cad-face-offset.cpp instead,
+    # which also removes and re-fillets the rounds beside the moved faces.
+
+    # ── Operations: split / defeature / draft / reshape (Phase W) ────────
+    # Splitter → split-body/split-face (SetArguments/SetTools/Build/Shape);
+    # Defeaturing → remove-face (SetShape/AddFacesToRemove/Build/Shape);
+    # DraftAngle → true tapered draft (Add(face,dir,angle,plane)/Build/Shape);
+    # BRepTools_ReShape → instantiable low-level Replace/Remove/Apply for
+    # replace-face. Base classes (BuilderAlgo/Algo/ModifyShape/Transient)
+    # are already whitelisted above. No new Handle_ symbols (avoids the
+    # embind derived-handle upcast breakage — see memory).
+    - symbol: BRepAlgoAPI_Splitter
+    - symbol: BRepAlgoAPI_Defeaturing
+    - symbol: BRepOffsetAPI_DraftAngle
+    # MakeDraft → a tapered extrude whose walls DraftAngle refuses: DraftAngle
+    # drafts only planes, cylinders and cones, so an ellipse, spline, Bézier
+    # or conic wall needs the swept draft (one wire per call; Perform(plane)).
+    - symbol: BRepOffsetAPI_MakeDraft
+    - symbol: BRepTools_ReShape
+
+    # ── Mesh / triangulation ─────────────────────────────────────────────
+    - symbol: BRepMesh_IncrementalMesh
+    # NOTE: IMeshTools_Parameters is intentionally NOT whitelisted. opencascade.js
+    # bindgen exposes only its ctor + delete (its Angle/Deflection/... are public
+    # DATA MEMBERS, which the generator does not bind), so it cannot drive meshing —
+    # BRepMesh_IncrementalMesh_3 would mesh at coarse OCCT defaults. Use the 4-arg
+    # BRepMesh_IncrementalMesh_2 (linear, relative, angular, parallel) instead.
+    - symbol: Poly_Triangulation
+    - symbol: Poly_Triangle
+    - symbol: Poly_Array1OfTriangle
+
+    # ── Array containers (essential for BSpline ctors, weights, knots) ──
+    - symbol: TColgp_Array1OfPnt
+    - symbol: TColgp_Array2OfPnt
+    - symbol: TColStd_Array1OfReal
+    - symbol: TColStd_Array1OfInteger
+
+    # ── Handle types: bound with their classes (libcascade 3) — no entries ─
+
+    # ── Curve / surface analysis ─────────────────────────────────────────
+    - symbol: BRepAdaptor_Curve
+    - symbol: BRepAdaptor_Surface
+    # OCCT 8: the BRep adaptors hold their geometry through these; without
+    # them embind cannot construct BRepAdaptor_Surface ("unbound types").
+    - symbol: GeomAdaptor_TransformedCurve
+    - symbol: GeomAdaptor_TransformedSurface
+    - symbol: GeomAdaptor_Curve
+    - symbol: GeomAdaptor_Surface
+    - symbol: GeomAbs_CurveType
+    - symbol: GeomAbs_SurfaceType
+    - symbol: GeomAbs_Shape
+    - symbol: GCPnts_TangentialDeflection
+    - symbol: GCPnts_AbscissaPoint
+
+    # ── 3D geometry handles ─────────────────────────────────────────────
+    - symbol: Geom_Curve
+    - symbol: Geom_Surface
+    - symbol: Geom_BoundedCurve
+    - symbol: Geom_TrimmedCurve
+    - symbol: Geom_Line
+    - symbol: Geom_Circle
+    - symbol: Geom_Ellipse
+    - symbol: Geom_Plane
+    - symbol: Geom_CylindricalSurface
+    - symbol: Geom_ConicalSurface
+    - symbol: Geom_SphericalSurface
+    - symbol: Geom_ToroidalSurface
+    - symbol: Geom_SurfaceOfRevolution
+    - symbol: Geom_SurfaceOfLinearExtrusion
+    - symbol: Geom_BSplineCurve
+    - symbol: Geom_BSplineSurface
+    # The bases embind needs before it constructs the surfaces above ("unbound
+    # types: Geom_BoundedSurface" / "Geom_ElementarySurface"): without them a
+    # B-spline surface — Convert Mesh's smooth faces — could not be made at all.
+    - symbol: Geom_ElementarySurface
+    - symbol: Geom_BoundedSurface
+    - symbol: Geom_SweptSurface
+    - symbol: Geom_BezierSurface
+    - symbol: Geom_RectangularTrimmedSurface
+
+    # ── 2D curves: pcurves, so a curved face can have any outline ───────
+    - symbol: Geom2d_Geometry
+    - symbol: Geom2d_Curve
+    - symbol: Geom2d_BoundedCurve
+    - symbol: Geom2d_Line
+    - symbol: Geom2d_TrimmedCurve
+    - symbol: Geom2d_BSplineCurve
+    - symbol: Geom2d_BezierCurve
+
+    # ── BSpline / NURBS construction helpers ────────────────────────────
+    - symbol: GeomAPI_PointsToBSpline
+    - symbol: GeomAPI_Interpolate
+    - symbol: GeomAPI_ProjectPointOnCurve
+    - symbol: GeomAPI_ProjectPointOnSurf
+    - symbol: GeomConvert
+    # Surfaces through points and between boundary curves (Convert Mesh: Smooth).
+    - symbol: GeomAPI_PointsToBSplineSurface
+    - symbol: GeomFill_BSplineCurves
+    - symbol: GeomFill_FillingStyle
+    - symbol: BRepOffsetAPI_MakeFilling
+
+    # ── Bounding boxes ──────────────────────────────────────────────────
+    - symbol: Bnd_Box
+    - symbol: BRepBndLib
+
+    # ── Mass properties ─────────────────────────────────────────────────
+    - symbol: GProp_GProps
+    - symbol: BRepGProp
+
+    # ── Validity / repair ───────────────────────────────────────────────
+    - symbol: ShapeFix_Shape
+    - symbol: ShapeFix_Wire
+    # Their base: without it `new ShapeFix_Shape` threw "unbound types: ShapeFix_Root".
+    - symbol: ShapeFix_Root
+    - symbol: ShapeFix_Face
+    - symbol: ShapeFix_Edge
+    - symbol: ShapeFix_Shell
+    - symbol: ShapeFix_Solid
+
+    # ── Solid classification ────────────────────────────────────────────
+    - symbol: BRepClass3d_SolidClassifier
+
+    # ── Distance / closest point (snap-to-curve / surface) ─────────────
+    - symbol: BRepExtrema_DistShapeShape
+    - symbol: Extrema_ExtPC
+    - symbol: Extrema_ExtPS
+
+    # ── Bezier curves (cubic Bezier IR support without BSpline conv) ────
+    - symbol: Geom_BezierCurve
+
+    # ── STL ──────────────────────────────────────────────────────────────
+    - symbol: StlAPI_Reader
+    - symbol: StlAPI_Writer
+
+    # ── BREP serialization (BR3 durable shape store) ────────────────────
+    - symbol: BRepTools
+    - symbol: BinTools
+
+    # ══════════════════════════════════════════════════════════════════════
+    # CAD file import / export (X: STEP/IGES I/O)
+    # Export/import run on the same worker that built the shape. Pulls
+    # TKDESTEP/TKDEIGES into the binary (~+several MB — acceptable for round-trip).
+    # ══════════════════════════════════════════════════════════════════════
+    # XSControl_Reader is the shared base of STEPControl_Reader + IGESControl_Reader.
+    # embind cannot construct a derived class whose base is unbound ("unbound
+    # types: XSControl_Reader"), so it must be listed explicitly.
+    - symbol: XSControl_Reader
+    - symbol: STEPControl_Reader
+    - symbol: STEPControl_Writer
+    - symbol: STEPControl_StepModelType
+    - symbol: IGESControl_Reader
+    - symbol: IGESControl_Writer
+    - symbol: IFSelect_ReturnStatus
+    - symbol: Interface_Static
+
+  # ── Interface_Static statics, bound by hand ──────────────────────────
+  # Listing `Interface_Static` above is not enough. The generator emits
+  # `class_<Interface_Static, base<Interface_TypedValue>>`, and
+  # Interface_TypedValue is not a bound symbol, so embind never resolves the
+  # class: the JS side gets a bare constructor with NO members — every
+  # method dropped, statics included. Binding the base chain
+  # (Interface_TypedValue → MoniTool_TypedValue) would drag two more classes
+  # in to reach two functions; these free functions are the whole need.
+  # `write.step.unit` is what lets STEP export honour a document's unit.
+  additionalBindFiles:
+    - occt-bindings.cpp
+    - cad-extract.cpp
+    - cad-face-offset.cpp
+    - cad-holed-mesh.cpp
+
+  emccFlags:
+    - -O3
+    # The libcascade image compiles OCCT at -O3 with SIMD and without LTO
+    # (OCJS_LTO=0); these match it.
+    - -msimd128
+    - -mbulk-memory
+    # Native WASM exceptions (libcascade 3 / Emscripten 6): an OCCT C++ failure
+    # reaches JavaScript as a WebAssembly.Exception, decoded with
+    # getExceptionMessage and released with decrementExceptionRefcount —
+    # sdk/backend/occt/src/errors.ts.
+    - -fwasm-exceptions
+    - -sEXPORT_ES6=1
+    - -sMODULARIZE
+    - -sEXPORTED_RUNTIME_METHODS=["FS","wasmMemory","getExceptionMessage","incrementExceptionRefcount","decrementExceptionRefcount"]
+    - -sWASM_BIGINT
+    - -sINITIAL_MEMORY=100MB
+    - -sMAXIMUM_MEMORY=4GB
+    - -sALLOW_MEMORY_GROWTH=1
+    - -sUSE_FREETYPE=1
+    - --no-entry
