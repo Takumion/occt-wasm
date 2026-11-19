@@ -145,7 +145,7 @@ mainBuild:
     # a frame other than the default is reachable at all.
     - symbol: GeomFill_Trihedron
     # A sweep's taper (actions-plan M3-3): each section is the profile's region
-    # OFFSET in its own plane by s·tan θ (Fusion p50c), not scaled — a 2D wire
+    # OFFSET in its own plane by s·tan θ (probe p50c), not scaled — a 2D wire
     # offset with intersection joins. TypeOfContact is MakePipeShell's
     # auxiliary-spine (guide rail) mode argument; without it that SetMode
     # overload throws "unknown type".
