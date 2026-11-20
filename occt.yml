@@ -358,6 +358,13 @@ mainBuild:
     - -sEXPORTED_RUNTIME_METHODS=["FS","wasmMemory","getExceptionMessage","incrementExceptionRefcount","decrementExceptionRefcount"]
     - -sWASM_BIGINT
     - -sINITIAL_MEMORY=100MB
+    # OCCT puts whole matrices on the stack (BSplCLib::BuildBSpMatrix under
+    # BRepOffset_MakeOffset's SameParameter): Emscripten's default stack (64 KB
+    # since 3.1.27) ran over on an offset of a filleted, chamfered body and
+    # wrote into the heap silently — every later call on that worker failed
+    # ("null function", "cannot write BREP"). Natively the same offset needs
+    # over 96 KB.
+    - -sSTACK_SIZE=4MB
     - -sMAXIMUM_MEMORY=4GB
     - -sALLOW_MEMORY_GROWTH=1
     - -sUSE_FREETYPE=1
